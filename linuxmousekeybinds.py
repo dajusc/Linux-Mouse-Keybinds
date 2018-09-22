@@ -6,13 +6,19 @@
 # If you get an "permission denied" error on start, check which group the devices
 # in /dev/input/ belong to (usually "input") and add your user to this group
 
+import sys
 import subprocess
 import evdev
 import select
-import thread
 import natsort
 import time
 import signal
+
+if (sys.version_info > (3, 0)): # Python3
+     import _thread
+     thread = _thread
+else: # Python2
+     import thread
 
 
 class linuxmousekeybinds():
@@ -144,20 +150,18 @@ class linuxmousekeybinds():
                 for event in dev.read():
                     if event.type == evdev.ecodes.EV_KEY or (event.type == evdev.ecodes.EV_REL and event.code not in [0, 1]) or appind_last == None:
 
-                        h = subprocess.Popen("xdotool getactivewindow",
-                                             stdout=subprocess.PIPE, shell=True)
-                        appind = h.stdout.read().strip()
+                        h = subprocess.Popen("xdotool getactivewindow", stdout=subprocess.PIPE, shell=True)
+                        appind = int(h.stdout.read().decode('utf-8').strip())
                         if appind != appind_last:
                             appind_last = appind
                             h = subprocess.Popen("xdotool getwindowpid  {}".format(appind), stdout=subprocess.PIPE, shell=True)
-                            apppid = h.stdout.read().strip()
+                            apppid = int(h.stdout.read().decode('utf-8').strip())
                             h = subprocess.Popen("xdotool getwindowname {}".format(appind), stdout=subprocess.PIPE, shell=True)
-                            appnam = h.stdout.read().strip()
+                            appnam = h.stdout.read().decode('utf-8').strip()
                             if self.verbose and appnam != "":
                                 print("Active window changed to \"{}\" (PID: {})".format(appnam, apppid))
 
-                        # binding based on windowname
-                        keynams = self._get_keynam(appnam, event.code, event.value)
+                        keynams = self._get_keynam(appnam, event.code, event.value) # binding based on windowname
                         if self.bindbypid and keynams == None:
                             keynams = self._get_keynam(
                                 apppid, event.code, event.value)  # binding based on PID
@@ -176,7 +180,7 @@ class linuxmousekeybinds():
 
 
 if __name__ == "__main__":
-    print "######################################################################"
+    print("######################################################################")
 
     lmkb = linuxmousekeybinds("Logitech G500s Laser Gaming Mouse")
     #--
