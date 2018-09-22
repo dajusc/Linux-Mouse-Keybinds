@@ -111,6 +111,7 @@ class linuxmousekeybinds():
         self.cfgs[devnam][appnam][evcode][evvalu] = keynam
 
     def _get_keynam(self, appnam, evcode, evvalu, devnam=None):
+        appnam = str(appnam)
         if devnam == None:
             devnam = self.actdevnam
         if appnam not in self.cfgs.get(devnam, {}):
@@ -163,8 +164,7 @@ class linuxmousekeybinds():
 
                         keynams = self._get_keynam(appnam, event.code, event.value) # binding based on windowname
                         if self.bindbypid and keynams == None:
-                            keynams = self._get_keynam(
-                                apppid, event.code, event.value)  # binding based on PID
+                            keynams = self._get_keynam(apppid, event.code, event.value) # binding based on PID
                         if keynams != None:
                             self._do_keystroke(appind, keynams)
         finally:
@@ -193,6 +193,7 @@ if __name__ == "__main__":
     lmkb.bind_key_to_button("EthanCarter (64-bit, PCD3D_SM5)", "BTN_SIDE", "btn-down", "Escape")  # thumb button backward
     #--
     lmkb.bind_key_to_button("Spyder (Python 2.7)", "BTN_SIDE", "btn-down", "4,2") # sequential keypresses
+    lmkb.bind_key_to_button(2726, "BTN_SIDE", "btn-down", "e") 
     #--
     lmkb.run()
     #--
