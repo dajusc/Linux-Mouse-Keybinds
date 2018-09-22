@@ -160,6 +160,7 @@ class linuxmousekeybinds():
                             h = subprocess.Popen("xdotool getwindowname {}".format(appind), stdout=subprocess.PIPE, shell=True)
                             appnam = h.stdout.read().decode('utf-8').strip()
                             if self.verbose and appnam != "":
+                                appnam = appnam.encode('ascii', 'ignore').decode('utf-8')
                                 print("Active window changed to \"{}\" (PID: {})".format(appnam, apppid))
 
                         keynams = self._get_keynam(appnam, event.code, event.value) # binding based on windowname
