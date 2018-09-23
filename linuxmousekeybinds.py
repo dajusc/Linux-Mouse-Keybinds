@@ -89,7 +89,7 @@ class linuxmousekeybinds():
             return None
 
     def bind_key_to_button(self, appnam, btnnam, btndir, keynam, devnam=None):
-        if type(appnam) != str:
+        if type(appnam) == int:
             appnam = str(appnam)
             self.bindbypid = True
         if devnam == None:
@@ -117,7 +117,8 @@ class linuxmousekeybinds():
         self.cfgs[devnam][appnam][evcode][evvalu] = keynam
 
     def _get_keynam(self, appnam, evcode, evvalu, devnam=None):
-        appnam = str(appnam)
+        if type(appnam) == int:
+            appnam = str(appnam)
         if devnam == None:
             devnam = self.actdevnam
         if appnam not in self.cfgs.get(devnam, {}):
