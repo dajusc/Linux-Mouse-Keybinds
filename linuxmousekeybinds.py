@@ -195,16 +195,17 @@ if __name__ == "__main__":
 
     lmkb = linuxmousekeybinds("Logitech G500s Laser Gaming Mouse")
     #--
-    lmkb.bind_key_to_button("Rise of the Tomb Raider™", "BTN_EXTRA",   "btn-down", "3")  # thumb button forward
-    lmkb.bind_key_to_button("Rise of the Tomb Raider™", "BTN_FORWARD", "btn-down", "c")  # thumb button middle
-    lmkb.bind_key_to_button("Rise of the Tomb Raider™", "BTN_SIDE",    "btn-down", "Escape")  # thumb button backward
-    lmkb.bind_key_to_button("Rise of the Tomb Raider™", "REL_HWHEEL",  "whl-left", "r")  # wheel sideways left
-    lmkb.bind_key_to_button("Rise of the Tomb Raider™", "REL_HWHEEL",  "whl-right", "v")  # wheel sideways right
+    lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_EXTRA",   "btn-down", "3")  # thumb button forward
+    lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_FORWARD", "btn-down", "c")  # thumb button middle
+    lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_SIDE",    "btn-down", "Escape")  # thumb button backward
+    lmkb.bind_key_to_button("Rise of the Tomb Raider", "REL_HWHEEL",  "whl-left", "r")  # wheel sideways left
+    lmkb.bind_key_to_button("Rise of the Tomb Raider", "REL_HWHEEL",  "whl-right", "v")  # wheel sideways right
     #--
     lmkb.bind_key_to_button("EthanCarter (64-bit, PCD3D_SM5)", "BTN_SIDE", "btn-down", "Escape")  # thumb button backward
     #--
-    lmkb.bind_key_to_button("Spyder (Python 2.7)", "BTN_SIDE", "btn-down", "4,2") # sequential keypresses
-    lmkb.bind_key_to_button(2726, "BTN_SIDE", "btn-down", "e") 
+    lmkb.bind_key_to_button("Layers of Fear", "BTN_SIDE", "btn-down", "Escape")  # thumb button backward
+    #--
+#    lmkb.bind_key_to_button(None, "BTN_SIDE", "btn-down", "4,3") # thumb button backward
     #--
     lmkb.run()
     #--
@@ -222,7 +223,7 @@ if __name__ == "__main__":
 #    lmkb.bind_key_to_button(None, "REL_WHEEL",   "whl-up",    "6") # wheel up
 #    lmkb.bind_key_to_button(None, "REL_WHEEL",   "whl-down",  "7") # wheel down
 #    #--
-#    lmkb.bind_key_to_button(7154, "BTN_SIDE", "btn-down", "3") # Binding by PID instead of window-name
+#    lmkb.bind_key_to_button(7154, "BTN_SIDE", "btn-down", "3") # binding by PID instead of window-name
 #    #--
 #    lmkb.bind_key_to_button("Rise of the Tomb Raider™", "BTN_EXTRA",   "btn-down", "1") # thumb button forward
 #    lmkb.bind_key_to_button("Rise of the Tomb Raider™", "BTN_FORWARD", "btn-down", "2") # thumb button middle
