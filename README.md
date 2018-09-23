@@ -29,15 +29,14 @@ Below you can see a configuration example.
 If you misconfigure *linuxmousekeybinds* it will give you usefull tips about the allowed settings.
 ```
 lmkb = linuxmousekeybinds("Logitech G500s Laser Gaming Mouse")
-lmkb.bind_key_to_button("Rise of the Tomb Raider™", "BTN_EXTRA",   "btn-down", "3")  # thumb button forward
-lmkb.bind_key_to_button("Rise of the Tomb Raider™", "BTN_FORWARD", "btn-down", "c")  # thumb button middle
-lmkb.bind_key_to_button("Rise of the Tomb Raider™", "BTN_SIDE",    "btn-down", "Escape")  # thumb button backward
-lmkb.bind_key_to_button("Rise of the Tomb Raider™", "REL_HWHEEL",  "whl-left", "r")  # wheel sideways left
-lmkb.bind_key_to_button("Rise of the Tomb Raider™", "REL_HWHEEL",  "whl-right", "v")  # wheel sideways right
-lmkb.bind_key_to_button("EthanCarter (64-bit, PCD3D_SM5)", "BTN_SIDE", "btn-down", "Escape")  # different game
-lmkb.bind_key_to_button(None, "BTN_SIDE", "btn-down", "1")  # default binding for any other
-lmkb.bind_key_to_button("Spyder (Python 2.7)", "BTN_SIDE", "btn-down", "4,2") # sequential keypresses
-lmkb.bind_key_to_button(7154, "BTN_SIDE", "btn-down", "3") # Binding by PID instead of window-name
+lmkb.bind_key_to_button("Rise of the Tomb Raider™", "BTN_EXTRA",   "3")  # thumb button forward
+lmkb.bind_key_to_button("Rise of the Tomb Raider™", "BTN_FORWARD", "c")  # thumb button middle
+lmkb.bind_key_to_button("Rise of the Tomb Raider™", "BTN_SIDE",    "Escape")  # thumb button backward
+lmkb.bind_key_to_button("Rise of the Tomb Raider™", "REL_HWHEEL+", "r")  # wheel sideways left
+lmkb.bind_key_to_button("Rise of the Tomb Raider™", "REL_HWHEEL-", "v")  # wheel sideways right
+lmkb.bind_key_to_button("EthanCarter (64-bit, PCD3D_SM5)", "BTN_SIDE", "Escape") 
+lmkb.bind_key_to_button(None, "BTN_SIDE", "1")  # default binding for any other window
+lmkb.bind_key_to_button(7154, "BTN_SIDE", "3")  # binding by PID instead of window-name
 lmkb.run()
 while lmkb.is_running():
     time.sleep(.1)
