@@ -2,14 +2,14 @@
 Configurable keybinds for gaming mice in linux. Works for Wine/Proton apps. Features automatic profiles.
 
 ## Overview
-Binding keyboard keys to the buttons my gaming mouse is essential for some users (like me).
+Binding keyboard keys to the buttons of gaming mouse is essential for some users (like me).
 For Windows and Mac the vendors offer configuration software, e.g. "*RAZER Synapse*", "*ROCCAT Swarm*" or "*Logitech Gaming Software*", while they do not offer a linux version.
 For linux there are tools like **xbindkeys** and **imwheelrc** which work nice for X-applications, but do unfortunately stop to work as soon as a Wine or Proton (Steam Play) game is started.
 [Piper](https://github.com/libratbag/piper) is a very cool project for configuring gaming mouse, but its keybinding functionality just didn't work out for me (e.g. ESC-key can not be assigned).
 
 So I wrote this lightweight keybinder-script in **Python** (no GUI), based on the **evdev** module and **xdotool**.
 No installation is required and it works in Wine or Proton.
-Because a window name or PID can be given in the binding configuration, the script features an fully automatic switching of the keybindings for as many games as you want.
+Because a window name or PID can be given in the binding configuration, the script features an fully automatic switching of the keybindings for as many different games as you want.
 
 ## Usage
 Open "*linuxmousekeybinds.py*" in a text editor, scroll to the bottom and configure to your needs (help see beow).
