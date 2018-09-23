@@ -124,7 +124,7 @@ class linuxmousekeybinds():
             appnam = None  # Default binding settings
         return self.cfgs.get(devnam, {}).get(appnam, {}).get(evcode, {}).get(evvalu, None)
 
-    def _do_keystroke(self, appind, keynams):
+    def _do_keystrokes(self, appind, keynams):
         # print round(time.time()), keynam
         keynams = keynams.split(",")
         for ind, keynam in enumerate(keynams):
@@ -173,14 +173,14 @@ class linuxmousekeybinds():
                                 print("Active window changed to \"{}\" (PID: {})".format(appnam, apppid))
 
                         keynams = self._get_keynam(appnam, event.code, event.value) # binding based on windowname
-                        if self.bindbypid and keynams == None:
+                        if keynams == None and self.bindbypid:
                             keynams = self._get_keynam(apppid, event.code, event.value) # binding based on PID
                         if keynams != None:
-                            self._do_keystroke(appind, keynams)
+                            self._do_keystrokes(appind, keynams)
         finally:
             self.running = False
         if self.verbose:
-            print("Linux Mouse Keybinds stoped!")
+            print("Linux Mouse Keybinds stopped!")
 
     def stop(self, signum=None, sigframe=None):
         self.do_stop = True
