@@ -82,6 +82,12 @@ class linuxmousekeybinds():
                     name = name.upper()
                     self.btns[name] = int(code)
 
+    def _to_int(self, string):
+        try:
+            return int(string)
+        except:
+            return None
+
     def bind_key_to_button(self, appnam, btnnam, btndir, keynam, devnam=None):
         if type(appnam) != str:
             appnam = str(appnam)
@@ -152,11 +158,14 @@ class linuxmousekeybinds():
                     if event.type == evdev.ecodes.EV_KEY or (event.type == evdev.ecodes.EV_REL and event.code not in [0, 1]) or appind_last == None:
 
                         h = subprocess.Popen("xdotool getactivewindow", stdout=subprocess.PIPE, shell=True)
-                        appind = int(h.stdout.read().decode('utf-8').strip())
-                        if appind != appind_last:
+                        appind = h.stdout.read().decode('utf-8').strip()
+                        appind = self._to_int(appind)
+
+                        if appind not in [None, appind_last]:
                             appind_last = appind
                             h = subprocess.Popen("xdotool getwindowpid  {}".format(appind), stdout=subprocess.PIPE, shell=True)
-                            apppid = int(h.stdout.read().decode('utf-8').strip())
+                            apppid = h.stdout.read().decode('utf-8').strip()
+                            apppid = self._to_int(apppid)
                             h = subprocess.Popen("xdotool getwindowname {}".format(appind), stdout=subprocess.PIPE, shell=True)
                             appnam = h.stdout.read().decode('utf-8').strip()
                             if self.verbose and appnam != "":
