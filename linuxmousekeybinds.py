@@ -211,8 +211,8 @@ if __name__ == "__main__":
     lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_EXTRA",   "k")  # thumb button forward
     lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_FORWARD", "c")  # thumb button middle
     lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_SIDE",    "Escape")  # thumb button backward
-    lmkb.bind_key_to_button("Rise of the Tomb Raider", "REL_HWHEEL+", "r")  # wheel sideways left
-    lmkb.bind_key_to_button("Rise of the Tomb Raider", "REL_HWHEEL-", "v")  # wheel sideways right
+    lmkb.bind_key_to_button("Rise of the Tomb Raider", "REL_HWHEEL+", "v")  # wheel sideways right
+    lmkb.bind_key_to_button("Rise of the Tomb Raider", "REL_HWHEEL-", "r")  # wheel sideways left
     #--
     lmkb.bind_key_to_button("EthanCarter (64-bit, PCD3D_SM5)", "BTN_SIDE", "Escape")  # thumb button backward
     #--
@@ -231,8 +231,8 @@ if __name__ == "__main__":
 #    lmkb.bind_key_to_button(None, "BTN_EXTRA",   "1") # thumb button forward
 #    lmkb.bind_key_to_button(None, "BTN_FORWARD", "2") # thumb button middle
 #    lmkb.bind_key_to_button(None, "BTN_SIDE",    "3") # thumb button backward
-#    lmkb.bind_key_to_button(None, "REL_HWHEEL+", "4") # wheel sideways left
-#    lmkb.bind_key_to_button(None, "REL_HWHEEL-", "5") # wheel sideways right
+#    lmkb.bind_key_to_button(None, "REL_HWHEEL+", "4") # wheel sideways right
+#    lmkb.bind_key_to_button(None, "REL_HWHEEL-", "5") # wheel sideways left
 #    lmkb.bind_key_to_button(None, "REL_WHEEL+",  "6") # wheel up
 #    lmkb.bind_key_to_button(None, "REL_WHEEL-",  "7") # wheel down
 #    #--
