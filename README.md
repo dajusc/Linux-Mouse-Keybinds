@@ -1,5 +1,5 @@
 # Linux-Mouse-Keybinds
-Configurable keybinds for gaming mice in linux. Works for Wine/Proton apps. Features automatic profiles.
+Configurable mouse button keybinds for linux. Works for Wine/Proton apps. Features automatic profiles.
 
 ## Overview
 Binding keyboard keys to the buttons of gaming mouse is essential for some users (like me).
