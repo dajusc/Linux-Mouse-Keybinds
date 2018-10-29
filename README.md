@@ -27,16 +27,18 @@ The keybinding stops working as soon as the script exits (ctrl+C) or the termina
 ## Configuration tips and examples
 Below you can see a configuration example.
 If you misconfigure *linuxmousekeybinds* it will give you usefull tips about the allowed settings.
-```
+```python
 lmkb = linuxmousekeybinds("Logitech G500s Laser Gaming Mouse")
-lmkb.bind_key_to_button("Rise of the Tomb Raider™", "BTN_EXTRA",   "3")  # thumb button forward
-lmkb.bind_key_to_button("Rise of the Tomb Raider™", "BTN_FORWARD", "c")  # thumb button middle
-lmkb.bind_key_to_button("Rise of the Tomb Raider™", "BTN_SIDE",    "Escape")  # thumb button backward
-lmkb.bind_key_to_button("Rise of the Tomb Raider™", "REL_HWHEEL+", "r")  # wheel sideways left
-lmkb.bind_key_to_button("Rise of the Tomb Raider™", "REL_HWHEEL-", "v")  # wheel sideways right
-lmkb.bind_key_to_button("EthanCarter (64-bit, PCD3D_SM5)", "BTN_SIDE", "Escape") 
-lmkb.bind_key_to_button(None, "BTN_SIDE", "1")  # default binding for any other window
+
+lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_EXTRA",   "3")       # thumb button forward
+lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_FORWARD", "c")       # thumb button middle
+lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_SIDE",    "Escape")  # thumb button backward
+lmkb.bind_key_to_button("Rise of the Tomb Raider", "REL_HWHEEL+", "r")       # wheel sideways left
+lmkb.bind_key_to_button("Rise of the Tomb Raider", "REL_HWHEEL-", "v")       # wheel sideways right
+
 lmkb.bind_key_to_button(7154, "BTN_SIDE", "3")  # binding by PID instead of window-name
+lmkb.bind_key_to_button(None, "BTN_SIDE", "1")  # default binding for any other window
+
 lmkb.run()
 while lmkb.is_running():
     time.sleep(.1)
