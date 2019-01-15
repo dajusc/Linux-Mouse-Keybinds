@@ -118,6 +118,34 @@ class linuxmousekeybinds():
         if up:
             subprocess.Popen(cmd.format("keyup"), stdout=subprocess.PIPE, shell=True)
 
+    def _set_callback_focus_on_off(self, appnam, cbfunc, typ, devnam=None):
+        if devnam == None:
+            devnam = self.actdevnam
+        if not devnam in self.cfgs:
+            self.cfgs[devnam] = {}
+        if not appnam in self.cfgs[devnam]:
+            self.cfgs[devnam][appnam] = {}
+        self.cfgs[devnam][appnam][typ] = cbfunc
+
+    def set_callback_focus_on(self, appnam, cbfunc, devnam=None):
+        self._set_callback_focus_on_off(appnam, cbfunc, "callback_focus_on", devnam)
+
+    def set_callback_focus_off(self, appnam, cbfunc, devnam=None):
+        self._set_callback_focus_on_off(appnam, cbfunc, "callback_focus_off", devnam)
+
+    def _do_callback_focus_on_off(self, appnam, typ, devnam=None):
+        if devnam == None:
+            devnam = self.actdevnam
+        cbfunc = self.cfgs.get(devnam, {}).get(appnam, {}).get(typ, None)
+        if cbfunc != None:
+            cbfunc()
+
+    def _do_callback_focus_on(self, appnam, devnam=None):
+        self._do_callback_focus_on_off(appnam, "callback_focus_on", devnam=None)
+
+    def _do_callback_focus_off(self, appnam, devnam=None):
+        self._do_callback_focus_on_off(appnam, "callback_focus_off", devnam=None)
+
     def _to_int(self, string):
         try:
             return int(string)
@@ -161,6 +189,7 @@ class linuxmousekeybinds():
         EV_REL = evdev.ecodes.EV_REL
         dev = self.devs[self.actdevnam]
         appind_last = None
+        appnam_last = None
         self.do_stop = False
         self.running = True
         try:
@@ -178,10 +207,15 @@ class linuxmousekeybinds():
 
                     appind = self._get_active_window_index()
                     if appind not in [None, appind_last]:
+                        self._do_callback_focus_off(appnam_last)
+                        #--
                         appnam, apppid = self._get_window_name_and_pid(appind)
                         if self.verbose and appnam != "":
                             print("Active window changed to \"{}\" (PID: {})".format(appnam, apppid))
+                        #--
+                        self._do_callback_focus_on(appnam)
                     appind_last = appind
+                    appnam_last = appnam
 
                     keynam = self._get_keynam(appnam, evcode) # binding based on windowname
                     if keynam == None and self.bindbypid:
@@ -238,9 +272,16 @@ if __name__ == "__main__":
 #    #--
 #    lmkb.bind_key_to_button(7154, "BTN_SIDE", "3") # binding by PID instead of window-name
 #    #--
-#    lmkb.bind_key_to_button("Rise of the Tomb Raider™", "BTN_EXTRA",   "1") # thumb button forward
-#    lmkb.bind_key_to_button("Rise of the Tomb Raider™", "BTN_FORWARD", "2") # thumb button middle
-#    lmkb.bind_key_to_button("Rise of the Tomb Raider™", "BTN_SIDE",    "Escape") # thumb button backward
+#    lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_EXTRA",   "1") # thumb button forward
+#    lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_FORWARD", "2") # thumb button middle
+#    lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_SIDE",    "Escape") # thumb button backward
+#    #--
+#    def cb1():
+#        print("Tomb Raider got focus!")
+#    def cb2():
+#        print("Tomb Raider lost focus!")
+#    lmkb.set_callback_focus_on( "Rise of the Tomb Raider", cb1) # callback executed on getting focus, e.g. script to disable mouse acceleration
+#    lmkb.set_callback_focus_off("Rise of the Tomb Raider", cb2) # callback executed on loosing focus, e.g. script to re-enable mouse acceleration
 #    #--
 #    print lmkb.btns, "\n"
 #    print lmkb.cfgs, "\n"
