@@ -1,4 +1,3 @@
-# Linux-Mouse-Keybinds
 Configurable mouse button keybinds for linux. Works for Wine/Proton apps. Features automatic profiles.
 
 ## Overview
@@ -10,6 +9,7 @@ For linux there are tools like **xbindkeys** and **imwheelrc** which work nice f
 So I wrote this lightweight keybinder-script in **Python** (no GUI), based on the **evdev** module and **xdotool**.
 No installation is required and it works in Wine or Proton.
 Because a window name or PID can be given in the binding configuration, the script features an fully automatic switching of the keybindings for as many different games as you want.
+Also callback functions can be bound to on/off-focus-events, which is usefull for implementing automatic enabling/disabling of mouse accelleration (e.g. via xinput, not part of Linux-Mouse-Keybinds).
 
 ## Usage
 Open "*linuxmousekeybinds.py*" in a text editor, scroll to the bottom and configure to your needs (help see beow).
@@ -38,6 +38,14 @@ lmkb.bind_key_to_button("Rise of the Tomb Raider", "REL_HWHEEL-", "v")       # w
 
 lmkb.bind_key_to_button(7154, "BTN_SIDE", "3")  # binding by PID instead of window-name
 lmkb.bind_key_to_button(None, "BTN_SIDE", "1")  # default binding for any other window
+
+def cb1():
+    print("Tomb Raider got focus!")
+lmkb.set_callback_focus_on( "Rise of the Tomb Raider", cb1) # cb1 will be executed on Tomb Raider getting focus
+
+def cb2():
+    print("Tomb Raider lost focus!")
+lmkb.set_callback_focus_off("Rise of the Tomb Raider", cb2) # cb2 will be executed on Tomb Raider loosing focus
 
 lmkb.run()
 while lmkb.is_running():
