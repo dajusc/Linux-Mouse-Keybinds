@@ -270,47 +270,29 @@ class linuxmousekeybinds():
 if __name__ == "__main__":
     print("######################################################################")
 
+    # Example Config:
+    
     lmkb = linuxmousekeybinds("Logitech G500s Laser Gaming Mouse")
-    #--
-    lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_EXTRA",   "k")  # thumb button forward
-    lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_FORWARD", "c")  # thumb button middle
-    lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_SIDE",    "Escape")  # thumb button backward
-    lmkb.bind_key_to_button("Rise of the Tomb Raider", "REL_HWHEEL+", "v")  # wheel sideways right
-    lmkb.bind_key_to_button("Rise of the Tomb Raider", "REL_HWHEEL-", "r")  # wheel sideways left
-    #--
-    lmkb.bind_key_to_button("EthanCarter (64-bit, PCD3D_SM5)", "BTN_SIDE", "Escape")  # thumb button backward
-    #--
-    lmkb.bind_key_to_button("Layers of Fear", "BTN_SIDE", "Escape")  # thumb button backward
-    #--
-    lmkb.bind_key_to_button(None, "BTN_SIDE", "1") # default binding for any other window
-    #--
+
+    lmkb.bind_key_to_button("Tomb Raider", "BTN_EXTRA",   "3")       # thumb button forward
+    lmkb.bind_key_to_button("Tomb Raider", "BTN_FORWARD", "c")       # thumb button middle
+    lmkb.bind_key_to_button("Tomb Raider", "BTN_SIDE",    "Escape")  # thumb button backward
+    lmkb.bind_key_to_button("Tomb Raider", "REL_HWHEEL+", "r")       # wheel sideways left
+    lmkb.bind_key_to_button("Tomb Raider", "REL_HWHEEL-", "v")       # wheel sideways right
+
+    lmkb.bind_key_to_button(7154, "BTN_SIDE", "3")  # binding by PID instead of window-name
+    lmkb.bind_key_to_button(None, "BTN_SIDE", "1")  # default binding for any other window
+
+    lmkb.bind_key_to_button("Doom", "BTN_EXTRA", ["1", 500, "2"])  # Macro: "1", 500ms delay, "2"
+    lmkb.bind_key_to_button("Doom", "BTN_SIDE",  ["3-", 50, "3+"]) # Macro: "3"-keydown, 50ms delay, "3"-keyup
+
+    def cb1():
+        print("Tomb Raider got focus!")
+    def cb2():
+        print("Tomb Raider lost focus!")
+    lmkb.set_callback_focus_on( "Tomb Raider", cb1) # cb1 will be executed on Tomb Raider getting focus
+    lmkb.set_callback_focus_off("Tomb Raider", cb2) # cb2 will be executed on Tomb Raider loosing focus
+
     lmkb.run()
-    #--
     while lmkb.is_running():
         time.sleep(.1)
-
-#    #-- EXAMPLE --
-#    lmkb = linuxmousekeybinds("Logitech G500s Laser Gaming Mouse")
-#
-#    lmkb.bind_key_to_button("Tomb Raider", "BTN_EXTRA",   "3")       # thumb button forward
-#    lmkb.bind_key_to_button("Tomb Raider", "BTN_FORWARD", "c")       # thumb button middle
-#    lmkb.bind_key_to_button("Tomb Raider", "BTN_SIDE",    "Escape")  # thumb button backward
-#    lmkb.bind_key_to_button("Tomb Raider", "REL_HWHEEL+", "r")       # wheel sideways left
-#    lmkb.bind_key_to_button("Tomb Raider", "REL_HWHEEL-", "v")       # wheel sideways right
-#
-#    lmkb.bind_key_to_button(7154, "BTN_SIDE", "3")  # binding by PID instead of window-name
-#    lmkb.bind_key_to_button(None, "BTN_SIDE", "1")  # default binding for any other window
-#
-#    lmkb.bind_key_to_button("Doom", "BTN_EXTRA", ["1", 500, "2"])  # Macro: "1", 500ms delay, "2"
-#    lmkb.bind_key_to_button("Doom", "BTN_SIDE",  ["3-", 50, "3+"]) # Macro: "3"-keydown, 50ms delay, "3"-keyup
-#
-#    def cb1():
-#        print("Tomb Raider got focus!")
-#    def cb2():
-#        print("Tomb Raider lost focus!")
-#    lmkb.set_callback_focus_on( "Tomb Raider", cb1) # cb1 will be executed on Tomb Raider getting focus
-#    lmkb.set_callback_focus_off("Tomb Raider", cb2) # cb2 will be executed on Tomb Raider loosing focus
-#
-#    lmkb.run()
-#    while lmkb.is_running():
-#        time.sleep(.1)
