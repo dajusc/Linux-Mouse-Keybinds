@@ -13,14 +13,17 @@ Because a window name or PID can be given in the binding configuration, the scri
 Also callback functions can be bound to on/off-focus-events, which is usefull for implementing automatic enabling/disabling of mouse accelleration (e.g. via xinput, not part of Linux-Mouse-Keybinds).
 
 ## Usage
-Make sure your linux user is member of the group "input". 
 Open "*linuxmousekeybinds.py*" in a text editor, scroll to the bottom and configure to your needs (help see beow).
 Then start a terminal (e.g. *bash*) navigate to the scripts directory and type:
 ```
-$> python ./linuxmousekeybinds.py
+$> python3 ./linuxmousekeybinds.py
 ```
 You may now start your game, e.g via Wine or Proton (Steam Play), and leave the script running in the background.
 The keybinding stops working as soon as the script exits (ctrl+C) or the terminal is closed.
+
+## Dependencies and Preconditions
+Your linux user needs to have access to evdev, so e.g. has to be menber of the input group on Debian based systems.
+Python (2 or 3) and xdotool need to be installed.
 
 ## Warnings
 - The script does **not unbind** any differently applied bindings or native functions of the mouse buttons. It basically just applies the keystrokes *on top* of the already existing functionality of the buttons.
@@ -32,22 +35,24 @@ If you misconfigure *linuxmousekeybinds* it will give you usefull tips about the
 ```python
 lmkb = linuxmousekeybinds("Logitech G500s Laser Gaming Mouse")
 
-lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_EXTRA",   "3")       # thumb button forward
-lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_FORWARD", "c")       # thumb button middle
-lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_SIDE",    "Escape")  # thumb button backward
-lmkb.bind_key_to_button("Rise of the Tomb Raider", "REL_HWHEEL+", "r")       # wheel sideways left
-lmkb.bind_key_to_button("Rise of the Tomb Raider", "REL_HWHEEL-", "v")       # wheel sideways right
+lmkb.bind_key_to_button("Tomb Raider", "BTN_EXTRA",   "3")       # thumb button forward
+lmkb.bind_key_to_button("Tomb Raider", "BTN_FORWARD", "c")       # thumb button middle
+lmkb.bind_key_to_button("Tomb Raider", "BTN_SIDE",    "Escape")  # thumb button backward
+lmkb.bind_key_to_button("Tomb Raider", "REL_HWHEEL+", "r")       # wheel sideways left
+lmkb.bind_key_to_button("Tomb Raider", "REL_HWHEEL-", "v")       # wheel sideways right
 
 lmkb.bind_key_to_button(7154, "BTN_SIDE", "3")  # binding by PID instead of window-name
 lmkb.bind_key_to_button(None, "BTN_SIDE", "1")  # default binding for any other window
 
+lmkb.bind_key_to_button("Doom", "BTN_EXTRA", ["1", 500, "2"])  # Macro: "1", 500ms delay, "2"
+lmkb.bind_key_to_button("Doom", "BTN_SIDE",  ["3-", 50, "3+"]) # Macro: "3"-keydown, 50ms delay, "3"-keyup
+
 def cb1():
     print("Tomb Raider got focus!")
-lmkb.set_callback_focus_on( "Rise of the Tomb Raider", cb1) # cb1 will be executed on Tomb Raider getting focus
-
 def cb2():
     print("Tomb Raider lost focus!")
-lmkb.set_callback_focus_off("Rise of the Tomb Raider", cb2) # cb2 will be executed on Tomb Raider loosing focus
+lmkb.set_callback_focus_on( "Tomb Raider", cb1) # cb1 will be executed on Tomb Raider getting focus
+lmkb.set_callback_focus_off("Tomb Raider", cb2) # cb2 will be executed on Tomb Raider loosing focus
 
 lmkb.run()
 while lmkb.is_running():
