@@ -126,6 +126,19 @@ class linuxmousekeybinds():
         if up:
             subprocess.Popen(cmd.format("keyup"), stdout=subprocess.PIPE, shell=True)
 
+    def _do_macro(self, appind, macro):
+        for command in macro:
+            if type(command) in [int, float]: # delay in milliseconds
+                time.sleep(1e-3 * command)
+            elif type(command) in [str]: # keydown or keyup or keydown+up
+                keynam = command
+                down = ("-" in keynam)
+                up   = ("+" in keynam)
+                if not up and not down:
+                    up = down = True
+                keynam = keynam.strip("-+")
+                self._do_key(appind, keynam, down, up)
+
     def _set_callback_focus_on_off(self, appnam, cbfunc, typ, devnam=None):
         if devnam == None:
             devnam = self.actdevnam
@@ -238,7 +251,10 @@ class linuxmousekeybinds():
                     if keynam != None:
                         down = (evtype == EV_KEY and evvalu == 1) or (evtype == EV_REL)
                         up   = (evtype == EV_KEY and evvalu == 0) or (evtype == EV_REL)
-                        self._do_key(appind, keynam, down, up)
+                        if type(keynam) == list and down:
+                            self._do_macro(appind, macro=keynam)
+                        elif type(keynam) == str:
+                            self._do_key(appind, keynam, down, up)
         finally:
             self.running = False
         if self.verbose:
@@ -273,29 +289,28 @@ if __name__ == "__main__":
     while lmkb.is_running():
         time.sleep(.1)
 
-#    #-- EXAMPLES --
-#    lmkb = linuxmousekeybinds("Logitech USB Optical Mouse") # RX 1000
-#    #--
-#    lmkb.bind_key_to_button(None, "BTN_EXTRA",   "1") # thumb button forward
-#    lmkb.bind_key_to_button(None, "BTN_FORWARD", "2") # thumb button middle
-#    lmkb.bind_key_to_button(None, "BTN_SIDE",    "3") # thumb button backward
-#    lmkb.bind_key_to_button(None, "REL_HWHEEL+", "4") # wheel sideways right
-#    lmkb.bind_key_to_button(None, "REL_HWHEEL-", "5") # wheel sideways left
-#    lmkb.bind_key_to_button(None, "REL_WHEEL+",  "6") # wheel up
-#    lmkb.bind_key_to_button(None, "REL_WHEEL-",  "7") # wheel down
-#    #--
-#    lmkb.bind_key_to_button(7154, "BTN_SIDE", "3") # binding by PID instead of window-name
-#    #--
-#    lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_EXTRA",   "1") # thumb button forward
-#    lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_FORWARD", "2") # thumb button middle
-#    lmkb.bind_key_to_button("Rise of the Tomb Raider", "BTN_SIDE",    "Escape") # thumb button backward
-#    #--
+#    #-- EXAMPLE --
+#    lmkb = linuxmousekeybinds("Logitech G500s Laser Gaming Mouse")
+#
+#    lmkb.bind_key_to_button("Tomb Raider", "BTN_EXTRA",   "3")       # thumb button forward
+#    lmkb.bind_key_to_button("Tomb Raider", "BTN_FORWARD", "c")       # thumb button middle
+#    lmkb.bind_key_to_button("Tomb Raider", "BTN_SIDE",    "Escape")  # thumb button backward
+#    lmkb.bind_key_to_button("Tomb Raider", "REL_HWHEEL+", "r")       # wheel sideways left
+#    lmkb.bind_key_to_button("Tomb Raider", "REL_HWHEEL-", "v")       # wheel sideways right
+#
+#    lmkb.bind_key_to_button(7154, "BTN_SIDE", "3")  # binding by PID instead of window-name
+#    lmkb.bind_key_to_button(None, "BTN_SIDE", "1")  # default binding for any other window
+#
+#    lmkb.bind_key_to_button("Doom", "BTN_EXTRA", ["1", 500, "2"])  # Macro: "1", 500ms delay, "2"
+#    lmkb.bind_key_to_button("Doom", "BTN_SIDE",  ["3-", 50, "3+"]) # Macro: "3"-keydown, 50ms delay, "3"-keyup
+#
 #    def cb1():
 #        print("Tomb Raider got focus!")
 #    def cb2():
 #        print("Tomb Raider lost focus!")
-#    lmkb.set_callback_focus_on( "Rise of the Tomb Raider", cb1) # callback executed on getting focus, e.g. script to disable mouse acceleration
-#    lmkb.set_callback_focus_off("Rise of the Tomb Raider", cb2) # callback executed on loosing focus, e.g. script to re-enable mouse acceleration
-#    #--
-#    print lmkb.btns, "\n"
-#    print lmkb.cfgs, "\n"
+#    lmkb.set_callback_focus_on( "Tomb Raider", cb1) # cb1 will be executed on Tomb Raider getting focus
+#    lmkb.set_callback_focus_off("Tomb Raider", cb2) # cb2 will be executed on Tomb Raider loosing focus
+#
+#    lmkb.run()
+#    while lmkb.is_running():
+#        time.sleep(.1)
