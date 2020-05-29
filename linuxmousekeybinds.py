@@ -63,6 +63,8 @@ class linuxmousekeybinds():
             print("ERROR: Invalid device name \"{}\". Must be one of: {}".format(devnam, self.devs.keys()))
 
     def _read_capabilities(self):
+        if self.actdevnam is None:
+            return
         dev = self.devs[self.actdevnam]
         capdict = dev.capabilities(verbose=True)
         caplist = [c for l in capdict.values() for c in l]
@@ -80,11 +82,15 @@ class linuxmousekeybinds():
                     self.btns[name + "-"] = -int(code)
 
     def bind_key_to_button(self, appnam, btnnam, keynam, devnam=None):
+        if devnam == None:
+            devnam = self.actdevnam
+        if devnam is None:
+            return
+        if keynam is None:
+            return
         if type(appnam) == int:
             appnam = str(appnam)
             self.bindbypid = True
-        if devnam == None:
-            devnam = self.actdevnam
         evcode = self.btns.get(btnnam, None)
         if evcode == None:
             if self.verbose:
@@ -101,10 +107,12 @@ class linuxmousekeybinds():
         self.cfgs[devnam][appnam][evcode] = keynam
 
     def _get_keynam(self, appnam, evcode, devnam=None):
-        if type(appnam) == int:
-            appnam = str(appnam)
         if devnam == None:
             devnam = self.actdevnam
+        if devnam is None:
+            return
+        if type(appnam) == int:
+            appnam = str(appnam)
         if appnam not in self.cfgs.get(devnam, {}):
             appnam = None  # Default binding settings
         return self.cfgs.get(devnam, {}).get(appnam, {}).get(evcode, None)
@@ -121,6 +129,8 @@ class linuxmousekeybinds():
     def _set_callback_focus_on_off(self, appnam, cbfunc, typ, devnam=None):
         if devnam == None:
             devnam = self.actdevnam
+        if devnam is None:
+            return
         if not devnam in self.cfgs:
             self.cfgs[devnam] = {}
         if not appnam in self.cfgs[devnam]:
@@ -136,6 +146,8 @@ class linuxmousekeybinds():
     def _do_callback_focus_on_off(self, appnam, typ, devnam=None):
         if devnam == None:
             devnam = self.actdevnam
+        if devnam is None:
+            return
         cbfunc = self.cfgs.get(devnam, {}).get(appnam, {}).get(typ, None)
         if cbfunc != None:
             cbfunc()
@@ -174,6 +186,8 @@ class linuxmousekeybinds():
         return (appnam, apppid)
 
     def run(self, in_new_thread=True):
+        if self.actdevnam is None:
+            return
         if in_new_thread:
             thread.start_new_thread(self._run, ())
             while not self.running:
