@@ -60,7 +60,7 @@ class linuxmousekeybinds():
             self.actdevnam = devnam
             self._read_capabilities()
         elif self.verbose:
-            print("ERROR: Invalid device name. Must be one of: {}".format(self.devs.keys()))
+            print("ERROR: Invalid device name \"{}\". Must be one of: {}".format(devnam, self.devs.keys()))
 
     def _read_capabilities(self):
         dev = self.devs[self.actdevnam]
@@ -88,7 +88,7 @@ class linuxmousekeybinds():
         evcode = self.btns.get(btnnam, None)
         if evcode == None:
             if self.verbose:
-                print("ERROR: Invalid button name. Must be one of: {}".format(self.btns.keys()))
+                print("ERROR: Invalid button name \"{}\". Must be one of: {}".format(btnnam, self.btns.keys()))
             return
         #--
         if not devnam in self.cfgs:
