@@ -47,6 +47,7 @@ lmkb.bind_key_to_button(None, "BTN_SIDE", "1")  # default binding for any other 
 
 lmkb.bind_key_to_button("Doom", "BTN_EXTRA", ["1", 500, "2"])  # Macro: "1", 500ms delay, "2"
 lmkb.bind_key_to_button("Doom", "BTN_SIDE",  ["3-", 50, "3+"]) # Macro: "3"-keydown, 50ms delay, "3"-keyup
+lmkb.bind_key_to_button("Doom", "BTN_SIDE",  [-100, "4"])      # Macro: 70ms to 130ms delay, "3"
 
 def cb1():
     print("Tomb Raider got focus!")
@@ -55,7 +56,5 @@ def cb2():
 lmkb.set_callback_focus_on( "Tomb Raider", cb1) # cb1 will be executed on Tomb Raider getting focus
 lmkb.set_callback_focus_off("Tomb Raider", cb2) # cb2 will be executed on Tomb Raider loosing focus
 
-lmkb.run()
-while lmkb.is_running():
-    time.sleep(.1)
+lmkb.run(in_new_thread=False)
 ```
