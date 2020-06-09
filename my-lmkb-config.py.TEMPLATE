@@ -1,0 +1,29 @@
+# -*- coding: utf-8 -*-
+# Example config
+
+import time
+from linuxmousekeybinds import linuxmousekeybinds
+
+lmkb = linuxmousekeybinds("Logitech G500s Laser Gaming Mouse")
+
+lmkb.bind_key_to_button("Tomb Raider", "BTN_EXTRA",   "3")       # thumb button forward
+lmkb.bind_key_to_button("Tomb Raider", "BTN_FORWARD", "c")       # thumb button middle
+lmkb.bind_key_to_button("Tomb Raider", "BTN_SIDE",    "Escape")  # thumb button backward
+lmkb.bind_key_to_button("Tomb Raider", "REL_HWHEEL+", "r")       # wheel sideways left
+lmkb.bind_key_to_button("Tomb Raider", "REL_HWHEEL-", "v")       # wheel sideways right
+
+lmkb.bind_key_to_button(7154, "BTN_SIDE", "3")  # binding by PID instead of window-name
+lmkb.bind_key_to_button(None, "BTN_SIDE", "1")  # default binding for any other window
+
+lmkb.bind_key_to_button("Doom", "BTN_EXTRA", ["1", 500, "2"])  # Macro: "1", 500ms delay, "2"
+lmkb.bind_key_to_button("Doom", "BTN_SIDE",  ["3-", 50, "3+"]) # Macro: "3"-keydown, 50ms delay, "3"-keyup
+lmkb.bind_key_to_button("Doom", "BTN_SIDE",  [-100, "4"])      # Macro: 70ms to 130ms delay, "3"
+
+def cb1():
+    print("Tomb Raider got focus!")
+def cb2():
+    print("Tomb Raider lost focus!")
+lmkb.set_callback_focus_on( "Tomb Raider", cb1) # cb1 will be executed on Tomb Raider getting focus
+lmkb.set_callback_focus_off("Tomb Raider", cb2) # cb2 will be executed on Tomb Raider loosing focus
+
+lmkb.run(in_new_thread=False)

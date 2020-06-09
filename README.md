@@ -13,10 +13,11 @@ Because a window name or PID can be given in the binding configuration, the scri
 Also callback functions can be bound to on/off-focus-events, which is usefull for implementing automatic enabling/disabling of mouse accelleration (e.g. via xinput, not part of Linux-Mouse-Keybinds).
 
 ## Usage
-Open "*linuxmousekeybinds.py*" in a text editor, scroll to the bottom and configure to your needs (help see beow).
-Then start a terminal (e.g. *bash*) navigate to the scripts directory and type:
+Rename "*my-lmkb-config.py.TEMPLATE*" to "*my-lmkb-config.py*"
+Open "*my-lmkb-config.py*" in a text editor and configure to your needs (help see beow).
+Start a terminal (e.g. *bash*), navigate to the scripts directory and type:
 ```
-$> python3 ./linuxmousekeybinds.py
+$> python3 ./my-lmkb-config.py
 ```
 You may now start your game, e.g via Wine or Proton (Steam Play), and leave the script running in the background.
 The keybinding stops working as soon as the script exits (ctrl+C) or the terminal is closed.
