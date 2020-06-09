@@ -13,7 +13,7 @@ Because a window name or PID can be given in the binding configuration, the scri
 Also callback functions can be bound to on/off-focus-events, which is usefull for implementing automatic enabling/disabling of mouse accelleration (e.g. via xinput, not part of Linux-Mouse-Keybinds).
 
 ## Usage
-Rename "*my-lmkb-config.py.TEMPLATE*" to "*my-lmkb-config.py*"
+Rename "*my-lmkb-config.py.TEMPLATE*" to "*my-lmkb-config.py*".
 Open "*my-lmkb-config.py*" in a text editor and configure to your needs (help see beow).
 Start a terminal (e.g. *bash*), navigate to the scripts directory and type:
 ```
