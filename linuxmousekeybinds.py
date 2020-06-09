@@ -13,6 +13,7 @@ import select
 import natsort
 import time
 import signal
+import random
 
 if (sys.version_info > (3, 0)): # Python3
      import _thread
@@ -129,6 +130,8 @@ class linuxmousekeybinds():
     def _do_macro(self, appind, macro):
         for command in macro:
             if type(command) in [int, float]: # delay in milliseconds
+                if command < 0:
+                    command *= -(0.3 * (1-2*random.random())+1) # +/- 30% random deviation of given value
                 time.sleep(1e-3 * command)
             elif type(command) in [str]: # keydown or keyup or keydown+up
                 keynam = command
@@ -271,7 +274,7 @@ if __name__ == "__main__":
     print("######################################################################")
 
     # Example Config:
-    
+
     lmkb = linuxmousekeybinds("Logitech G500s Laser Gaming Mouse")
 
     lmkb.bind_key_to_button("Tomb Raider", "BTN_EXTRA",   "3")       # thumb button forward
@@ -285,6 +288,7 @@ if __name__ == "__main__":
 
     lmkb.bind_key_to_button("Doom", "BTN_EXTRA", ["1", 500, "2"])  # Macro: "1", 500ms delay, "2"
     lmkb.bind_key_to_button("Doom", "BTN_SIDE",  ["3-", 50, "3+"]) # Macro: "3"-keydown, 50ms delay, "3"-keyup
+    lmkb.bind_key_to_button("Doom", "BTN_SIDE",  [-100, "4"])      # Macro: 70ms to 130ms delay, "3"
 
     def cb1():
         print("Tomb Raider got focus!")
