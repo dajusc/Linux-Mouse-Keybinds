@@ -8,7 +8,7 @@ For linux there are tools like **xbindkeys** and **imwheelrc** which work nice f
 [Piper](https://github.com/libratbag/piper) is a very cool project for configuring gaming mouse, but its keybinding functionality just didn't work out for me (e.g. ESC-key can not be assigned).
 
 So I wrote this lightweight keybinder-script in **Python** (no GUI), based on the **evdev** module and **xdotool**.
-No installation is required and it works in Wine or Proton.
+No installation is required and it works for apps that run in Wine or Proton.
 Because a window name or PID can be given in the binding configuration, the script features an fully automatic switching of the keybindings for as many different games as you want.
 Also callback functions can be bound to on/off-focus-events, which is usefull for implementing automatic enabling/disabling of mouse accelleration (e.g. via xinput, not part of Linux-Mouse-Keybinds).
 
@@ -43,7 +43,7 @@ lmkb.bind_key_to_button("Tomb Raider", "REL_HWHEEL+", "r")       # wheel sideway
 lmkb.bind_key_to_button("Tomb Raider", "REL_HWHEEL-", "v")       # wheel sideways right
 
 lmkb.bind_key_to_button(7154, "BTN_SIDE", "3")  # binding by PID instead of window-name
-lmkb.bind_key_to_button(None, "BTN_SIDE", "1")  # default binding for any other window
+lmkb.bind_key_to_button(None, "BTN_SIDE", "1")  # default binding for all other windows
 
 lmkb.bind_key_to_button("Doom", "BTN_EXTRA", ["1", 500, "2"])  # Macro: "1", 500ms delay, "2"
 lmkb.bind_key_to_button("Doom", "BTN_SIDE",  ["3-", 50, "3+"]) # Macro: "3"-keydown, 50ms delay, "3"-keyup
