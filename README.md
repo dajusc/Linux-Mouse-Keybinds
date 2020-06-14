@@ -23,8 +23,8 @@ You may now start your game, e.g via Wine or Proton (Steam Play), and leave the 
 The keybinding stops working as soon as the script exits (ctrl+C) or the terminal is closed.
 
 ## Dependencies and Preconditions
-Your linux user needs to have access to evdev, so e.g. has to be menber of the input group on Debian based systems.
-Python (2 or 3) and xdotool need to be installed.
+Your linux user needs to have access to **evdev**, so e.g. has to be member of the **input** group on Debian based systems.
+**Python (2 or 3)** and **xdotool** need to be installed.
 
 ## Warnings
 - The script does **not unbind** any differently applied bindings or native functions of the mouse buttons. It basically just applies the keystrokes *on top* of the already existing functionality of the buttons.
