@@ -115,9 +115,10 @@ class linuxmousekeybinds():
             return
         if type(appnam) == int:
             appnam = str(appnam)
-        if appnam not in self.cfgs.get(devnam, {}):
-            appnam = None  # Default binding settings
-        return self.cfgs.get(devnam, {}).get(appnam, {}).get(evcode, None)
+        for _appnam in [appnam, None]: # None = default binding settings
+            keynam = self.cfgs.get(devnam, {}).get(_appnam, {}).get(evcode, None)
+            if keynam is not None:
+                return keynam
 
     def _do_key(self, appind, keynam, down=True, up=True):
         cmd = "nice -n {} xdotool {} --window {} {}".format(self.nice, "{}", appind, keynam)
