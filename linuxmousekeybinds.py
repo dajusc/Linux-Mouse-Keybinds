@@ -23,10 +23,11 @@ else: # Python2
 
 
 class linuxmousekeybinds():
-    def __init__(self, devnam=None, nice=0, delay=0.05, verbose=True):
+    def __init__(self, devnam=None, nice=0, delay=0.05, verbose=True, debug=False):
         self.nice = nice  # Nice value (priority) of process doing the keystroke (xdotool).
         self.delay = delay # Time between key-down and key-up event. Increase if binding only sometimes work.
         self.verbose = verbose  # Print info about whats going on?
+        self.debug = debug  # Print debug info
         #--
         self.actdevnam = None  # Name of the active device (managed internally).
         self.running = False  # Is the daemon running? (managed internally).
@@ -214,6 +215,9 @@ class linuxmousekeybinds():
     def _run(self):
         if self.verbose:
             print("Linux Mouse Keybinds started!")
+        if self.debug:
+            print("DEBUG: Devices: {}".format(list(self.devs.keys())))
+            print("DEBUG: Buttons: {}".format(list(self.btns.keys())))
         #--
         EV_KEY = evdev.ecodes.EV_KEY
         EV_REL = evdev.ecodes.EV_REL
@@ -250,6 +254,9 @@ class linuxmousekeybinds():
                     keynam = self._get_keynam(appnam, evcode) # binding based on windowname
                     if keynam == None and self.bindbypid:
                         keynam = self._get_keynam(apppid, evcode) # binding based on PID
+
+                    if self.debug:
+                        print("DEBUG: evtype:{}, evcode:{}, evvalu:{}, keynam:{}".format(evtype, evcode, evvalu, keynam))
 
                     if keynam != None:
                         down = (evtype == EV_KEY and evvalu == 1) or (evtype == EV_REL)
