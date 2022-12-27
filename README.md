@@ -24,7 +24,7 @@ The keybinding stops working as soon as the script exits (ctrl+C) or the termina
 
 ## Dependencies and Preconditions
 Your linux user needs to have access to **evdev**, so e.g. has to be member of the **input** group on Debian based systems.
-**Python (2 or 3)** and **xdotool** need to be installed.
+**Python (2 or 3)** and **xdotool** as well as **readlink (from coreutils)** need to be installed.
 
 ## Warnings
 - The script does **not unbind** any differently applied bindings or native functions of the mouse buttons. It basically just applies the keystrokes *on top* of the already existing functionality of the buttons.
@@ -42,7 +42,8 @@ lmkb.bind_key_to_button("Tomb Raider", "BTN_SIDE",    "Escape")  # thumb button 
 lmkb.bind_key_to_button("Tomb Raider", "REL_HWHEEL+", "r")       # wheel sideways left
 lmkb.bind_key_to_button("Tomb Raider", "REL_HWHEEL-", "v")       # wheel sideways right
 
-lmkb.bind_key_to_button(7154, "BTN_SIDE", "3")  # binding by PID instead of window-name
+lmkb.bind_key_to_button(7154, "BTN_SIDE", "3")  # binding by process id (PID)
+lmkb.bind_key_to_button("/usr/bin/kate", "BTN_SIDE", "3")  # binding by application binary path
 lmkb.bind_key_to_button(None, "BTN_SIDE", "1")  # default binding for all other windows
 
 lmkb.bind_key_to_button("Doom", "BTN_EXTRA", ["1", 500, "2"])  # Macro: "1", 500ms delay, "2"

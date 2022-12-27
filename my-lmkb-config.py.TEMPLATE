@@ -12,8 +12,9 @@ lmkb.bind_key_to_button("Tomb Raider", "BTN_SIDE",    "Escape")  # thumb button 
 lmkb.bind_key_to_button("Tomb Raider", "REL_HWHEEL+", "r")       # wheel sideways left
 lmkb.bind_key_to_button("Tomb Raider", "REL_HWHEEL-", "v")       # wheel sideways right
 
-lmkb.bind_key_to_button(7154, "BTN_SIDE", "3")  # binding by PID instead of window-name
-lmkb.bind_key_to_button(None, "BTN_SIDE", "1")  # default binding for any other window
+lmkb.bind_key_to_button(7154, "BTN_SIDE", "3")  # binding by process id (PID)
+lmkb.bind_key_to_button("/usr/bin/kate", "BTN_SIDE", "3")  # binding by application binary path
+lmkb.bind_key_to_button(None, "BTN_SIDE", "1")  # default binding for all other windows
 
 lmkb.bind_key_to_button("Doom", "BTN_EXTRA", ["1", 500, "2"])  # Macro: "1", 500ms delay, "2"
 lmkb.bind_key_to_button("Doom", "BTN_SIDE",  ["3-", 50, "3+"]) # Macro: "3"-keydown, 50ms delay, "3"-keyup

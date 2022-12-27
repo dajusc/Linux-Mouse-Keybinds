@@ -204,6 +204,14 @@ class linuxmousekeybinds():
         if not self.exact:
             done = (appnam in self.cfgs.get(self.actdevnam, {}))
             if not done:
+                h = subprocess.Popen("readlink -f /proc/{}/exe".format(apppid), stdout=subprocess.PIPE, shell=True)
+                h.wait()
+                apppth = h.stdout.read().decode('utf-8').strip()
+                apppth = apppth.encode('ascii', 'ignore').decode('utf-8')
+                if apppth in self.cfgs.get(self.actdevnam, {}):
+                    appnam = apppth
+                    done   = True
+            if not done:
                 for cfg_appnam in self.cfgs.get(self.actdevnam, {}):
                     if appnam.startswith(cfg_appnam):
                         appnam = cfg_appnam
@@ -261,7 +269,7 @@ class linuxmousekeybinds():
                         #--
                         appnam, apppid = self._get_application_name_and_pid(winind)
                         if self.verbose and appnam != "":
-                            print("Active window changed to \"{}\" (PID: {})".format(appnam, apppid))
+                            print("Active application changed to \"{}\" (PID: {})".format(appnam, apppid))
                         #--
                         self._do_callback_focus_on(appnam)
                     winind_last = winind
