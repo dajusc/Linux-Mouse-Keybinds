@@ -9,7 +9,7 @@ For linux there are tools like **xbindkeys** and **imwheelrc** which work nice f
 
 So I wrote this lightweight keybinder-script in **Python** (no GUI), based on the **evdev** module and **xdotool**.
 No installation is required and it works for apps that run in Wine or Proton.
-Because a window name or PID can be given in the binding configuration, the script features an fully automatic switching of the keybindings for as many different games as you want.
+The window title, the process id (PID) or the applications binary file path can be given in the binding configuration, and the script features an fully automatic switching of the keybindings for as many different games as you want.
 Also callback functions can be bound to on/off-focus-events, which is usefull for implementing automatic enabling/disabling of mouse accelleration (e.g. via xinput, not part of Linux-Mouse-Keybinds).
 
 ## Usage
@@ -20,11 +20,11 @@ Start a terminal (e.g. *bash*), navigate to the scripts directory and type:
 $> python3 ./my-lmkb-config.py
 ```
 You may now start your game, e.g via Wine or Proton (Steam Play), and leave the script running in the background.
-The keybinding stops working as soon as the script exits (ctrl+C) or the terminal is closed.
+The keybinding stops working as soon as the script exits (ctrl+C) or when the terminal is closed.
 
 ## Dependencies and Preconditions
 Your linux user needs to have access to **evdev**, so e.g. has to be member of the **input** group on Debian based systems.
-**Python (2 or 3)** and **xdotool** as well as **readlink (from coreutils)** need to be installed.
+**Python (2 or 3)** and **xdotool** as well as **readlink** (from coreutils) need to be installed.
 
 ## Warnings
 - The script does **not unbind** any differently applied bindings or native functions of the mouse buttons. It basically just applies the keystrokes *on top* of the already existing functionality of the buttons.
