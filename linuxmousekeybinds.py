@@ -120,8 +120,8 @@ class linuxmousekeybinds():
             if keynam is not None:
                 return keynam
 
-    def _do_key(self, appind, keynam, down=True, up=True):
-        cmd = "nice -n {} xdotool {} --window {} {}".format(self.nice, "{}", appind, keynam)
+    def _do_key(self, winind, keynam, down=True, up=True):
+        cmd = "nice -n {} xdotool {} --window {} {}".format(self.nice, "{}", winind, keynam)
         if down:
             subprocess.Popen(cmd.format("keydown"), stdout=subprocess.PIPE, shell=True)
         if down and up:
@@ -129,7 +129,7 @@ class linuxmousekeybinds():
         if up:
             subprocess.Popen(cmd.format("keyup"), stdout=subprocess.PIPE, shell=True)
 
-    def _do_macro(self, appind, macro):
+    def _do_macro(self, winind, macro):
         for command in macro:
             if type(command) in [int, float]: # delay in milliseconds
                 if command < 0:
@@ -142,7 +142,7 @@ class linuxmousekeybinds():
                 if not up and not down:
                     up = down = True
                 keynam = keynam.strip("-+")
-                self._do_key(appind, keynam, down, up)
+                self._do_key(winind, keynam, down, up)
 
     def _set_callback_focus_on_off(self, appnam, cbfunc, typ, devnam=None):
         if devnam == None:
@@ -185,21 +185,21 @@ class linuxmousekeybinds():
     def _get_active_window_index(self):
         h = subprocess.Popen("xdotool getactivewindow", stdout=subprocess.PIPE, shell=True)
         h.wait()
-        appind = h.stdout.read().decode('utf-8').strip()
-        appind = self._to_int(appind)
+        winind = h.stdout.read().decode('utf-8').strip()
+        winind = self._to_int(winind)
         #--
-        return appind
+        return winind
 
-    def _get_window_name_and_pid(self, appind):
-        h = subprocess.Popen("xdotool getwindowname {}".format(appind), stdout=subprocess.PIPE, shell=True)
-        h.wait()
-        appnam = h.stdout.read().decode('utf-8').strip()
-        appnam = appnam.encode('ascii', 'ignore').decode('utf-8')
-        #--
-        h = subprocess.Popen("xdotool getwindowpid  {}".format(appind), stdout=subprocess.PIPE, shell=True)
+    def _get_application_name_and_pid(self, winind):
+        h = subprocess.Popen("xdotool getwindowpid {}".format(winind), stdout=subprocess.PIPE, shell=True)
         h.wait()
         apppid = h.stdout.read().decode('utf-8').strip()
         apppid = self._to_int(apppid)
+        #--
+        h = subprocess.Popen("xdotool getwindowname {}".format(winind), stdout=subprocess.PIPE, shell=True)
+        h.wait()
+        appnam = h.stdout.read().decode('utf-8').strip()
+        appnam = appnam.encode('ascii', 'ignore').decode('utf-8')
         #--
         return (appnam, apppid)
 
@@ -223,7 +223,7 @@ class linuxmousekeybinds():
         EV_KEY = evdev.ecodes.EV_KEY
         EV_REL = evdev.ecodes.EV_REL
         dev = self.devs[self.actdevnam]
-        appind_last = None
+        winind_last = None
         appnam_last = None
         self.do_stop = False
         self.running = True
@@ -240,16 +240,16 @@ class linuxmousekeybinds():
                     if (evtype == EV_REL):
                         evcode *= evvalu
 
-                    appind = self._get_active_window_index()
-                    if appind not in [None, appind_last]:
+                    winind = self._get_active_window_index()
+                    if winind not in [None, winind_last]:
                         self._do_callback_focus_off(appnam_last)
                         #--
-                        appnam, apppid = self._get_window_name_and_pid(appind)
+                        appnam, apppid = self._get_application_name_and_pid(winind)
                         if self.verbose and appnam != "":
                             print("Active window changed to \"{}\" (PID: {})".format(appnam, apppid))
                         #--
                         self._do_callback_focus_on(appnam)
-                    appind_last = appind
+                    winind_last = winind
                     appnam_last = appnam
 
                     keynam = self._get_keynam(appnam, evcode) # binding based on windowname
@@ -263,9 +263,9 @@ class linuxmousekeybinds():
                         down = (evtype == EV_KEY and evvalu == 1) or (evtype == EV_REL)
                         up   = (evtype == EV_KEY and evvalu == 0) or (evtype == EV_REL)
                         if type(keynam) == list and down:
-                            self._do_macro(appind, macro=keynam)
+                            self._do_macro(winind, macro=keynam)
                         elif type(keynam) == str:
-                            self._do_key(appind, keynam, down, up)
+                            self._do_key(winind, keynam, down, up)
         finally:
             self.running = False
         if self.verbose:
