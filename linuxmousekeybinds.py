@@ -23,15 +23,16 @@ else: # Python2
 
 
 class linuxmousekeybinds():
-    def __init__(self, devnam=None, nice=0, delay=0.05, verbose=True, debug=False):
-        self.nice = nice  # Nice value (priority) of process doing the keystroke (xdotool).
-        self.delay = delay # Time between key-down and key-up event. Increase if binding only sometimes work.
-        self.verbose = verbose  # Print info about whats going on?
-        self.debug = debug  # Print debug info
+    def __init__(self, devnam=None, nice=0, delay=0.05, exact=False, verbose=True, debug=False):
+        self.nice      = nice  # Nice value (priority) of process doing the keystroke (xdotool).
+        self.delay     = delay # Time between key-down and key-up event. Increase if binding only sometimes work.
+        self.verbose   = verbose  # Print info about whats going on?
+        self.exact     = exact  # Bind only if window title exactly matches the application name?
+        self.debug     = debug  # Print debug info
         #--
         self.actdevnam = None  # Name of the active device (managed internally).
-        self.running = False  # Is the daemon running? (managed internally).
-        self.do_stop = True  # Shall the daemon stop running? (managed internally).
+        self.running   = False  # Is the daemon running? (managed internally).
+        self.do_stop   = True  # Shall the daemon stop running? (managed internally).
         self.bindbypid = False  # False: Do not check for PID, just windowname (managed internally).
         #--
         self.devs = {}  # database of all available devices
@@ -200,6 +201,20 @@ class linuxmousekeybinds():
         h.wait()
         appnam = h.stdout.read().decode('utf-8').strip()
         appnam = appnam.encode('ascii', 'ignore').decode('utf-8')
+        if not self.exact:
+            done = (appnam in self.cfgs.get(self.actdevnam, {}))
+            if not done:
+                for cfg_appnam in self.cfgs.get(self.actdevnam, {}):
+                    if appnam.startswith(cfg_appnam):
+                        appnam = cfg_appnam
+                        done   = True
+                        break
+            if not done:
+                for cfg_appnam in self.cfgs.get(self.actdevnam, {}):
+                    if appnam.lower() in cfg_appnam.lower() or cfg_appnam.lower() in appnam.lower():
+                        appnam = cfg_appnam
+                        done   = True
+                        break
         #--
         return (appnam, apppid)
 
