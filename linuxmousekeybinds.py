@@ -40,6 +40,9 @@ class linuxmousekeybinds():
         self.dct_aek   = {}     # database mapping appname + evcode  to keyname
         #--
         signal.signal(signal.SIGINT, self.stop)
+        #--
+        if type(self.devnams) not in (list, set, tuple):
+            self.devnams = (self.devnams,)
 
 
     def __del__(self):
