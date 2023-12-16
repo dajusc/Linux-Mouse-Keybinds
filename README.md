@@ -31,7 +31,7 @@ Your linux user needs to have access to **evdev**, so e.g. has to be member of t
 - It seems possible that **anti cheat** engines for multiplayer games may categorize the actions performed by this script as cheating. So use it in singleplayer only or don't blame me if you get into trouble. ;)
 
 ## Configuration tips and examples
-Below you can see a configuration example.
+Below you can see two configuration examples.
 If you misconfigure *linuxmousekeybinds* it will give you usefull tips about the allowed settings.
 ```python
 lmkb = linuxmousekeybinds("Logitech G500s Laser Gaming Mouse")
@@ -45,6 +45,11 @@ lmkb.bind_key_to_button("Tomb Raider", "REL_HWHEEL-", "v")       # wheel sideway
 lmkb.bind_key_to_button(7154, "BTN_SIDE", "3")  # binding by process id (PID)
 lmkb.bind_key_to_button("/usr/bin/kate", "BTN_SIDE", "3")  # binding by application binary path
 lmkb.bind_key_to_button(None, "BTN_SIDE", "1")  # default binding for all other windows
+
+lmkb.run(in_new_thread=False)
+```
+```python
+lmkb = linuxmousekeybinds(("Logitech G502", "Logitech G502 LIGHTSPEED Wireless Gaming Mouse")) # Aliases of same mouse when pluged in or wireless
 
 lmkb.bind_key_to_button("Doom", "BTN_EXTRA", ["1", 500, "2"])  # Macro: "1", 500ms delay, "2"
 lmkb.bind_key_to_button("Doom", "BTN_SIDE",  ["3-", 50, "3+"]) # Macro: "3"-keydown, 50ms delay, "3"-keyup
