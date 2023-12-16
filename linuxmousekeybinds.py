@@ -30,7 +30,7 @@ class linuxmousekeybinds():
         self.exact     = exact  # Bind only if window title exactly matches the application name?
         self.debug     = debug  # Print debug info
         #--
-        self.actdevnam = None  # Name of the active device (managed internally).
+        self.actdevnam = devnam  # Name of the active device (managed internally).
         self.running   = False  # Is the daemon running? (managed internally).
         self.do_stop   = True  # Shall the daemon stop running? (managed internally).
         self.bindbypid = False  # False: Do not check for PID, just windowname (managed internally).
@@ -39,31 +39,26 @@ class linuxmousekeybinds():
         self.cfgs = {}  # database of configs
         self.btns = {}  # database buttonname-to-evcode (for the active device)
         #--
-        for devpth in natsort.natsorted(evdev.list_devices()):
-            dev = evdev.InputDevice(devpth)
-            name = dev.name
-            ind = 1
-            while name in self.devs:
-                ind += 1
-                name = "{} #{}".format(dev.name, ind)
-            self.devs[name] = dev
-        #--
-        if devnam != None:
-            self.select_dev(devnam)
-        elif self.verbose:
-            print("WARNING: No device set. Must be one of: {}".format(self.devs.keys()))
+        if self.actdevnam != None:
+            self._get_available_devs()  # create database of all available devices
+            self.select_dev(self.actdevnam)
         #--
         signal.signal(signal.SIGINT, self.stop)
 
     def __del__(self):
         self.stop()
 
-    def select_dev(self, devnam):
-        if devnam in self.devs:
-            self.actdevnam = devnam
-            self._read_capabilities()
-        elif self.verbose:
-            print("ERROR: Invalid device name \"{}\". Must be one of: {}".format(devnam, self.devs.keys()))
+    def _get_available_devs(self):
+        self.devs = {}  # database of all available devices
+        for devpth in natsort.natsorted(evdev.list_devices()):
+            dev  = evdev.InputDevice(devpth)
+            name = dev.name
+            ind  = 1
+            while name in self.devs:
+                ind += 1
+                name = "{} #{}".format(dev.name, ind)
+            self.devs[name] = dev
+        return self.devs
 
     def _read_capabilities(self):
         if self.actdevnam is None:
@@ -83,6 +78,18 @@ class linuxmousekeybinds():
                 if name.startswith("REL_"):
                     self.btns[name + "+"] = +int(code)
                     self.btns[name + "-"] = -int(code)
+
+    def _connect_dev(self, devnam=None):  # (re-)connect to first device of given devices
+        self.actdevnam = devnam or self.actdevnam
+        self._get_available_devs()
+        if self.actdevnam in self.devs:
+            self._read_capabilities()
+            return True
+        return False
+
+    def select_dev(self, devnam):
+        if not self._connect_dev(devnam) and self.verbose:
+            print("ERROR: Invalid device name \"{}\". Must be one of: {}".format(devnam, self.devs.keys()))
 
     def bind_key_to_button(self, appnam, btnnam, keynam, devnam=None):
         if devnam == None:
@@ -252,6 +259,7 @@ class linuxmousekeybinds():
         self.running = True
         try:
             while self.do_stop == False:
+              try:
                 r, w, x = select.select([dev], [], [])
                 for event in dev.read():
                     evtype = event.type
@@ -289,6 +297,21 @@ class linuxmousekeybinds():
                             self._do_macro(winind, macro=keynam)
                         elif type(keynam) == str:
                             self._do_key(winind, keynam, down, up)
+
+              except OSError as exc:
+                if exc.strerror == "No such device": # device got (temporarily) unconnected
+                    if self.verbose:
+                        print("Active device got unconnected! Waiting for reconnect...")
+                    while self.do_stop == False: # wait for reconnect
+                        time.sleep(3)
+                        if self._connect_dev():
+                            if self.verbose:
+                                print("Active device got reconnected.")
+                            dev = self.devs[self.actdevnam]
+                            break
+                else:
+                    raise
+
         finally:
             self.running = False
         if self.verbose:
