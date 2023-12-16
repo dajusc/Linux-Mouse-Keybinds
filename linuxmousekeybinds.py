@@ -23,50 +23,59 @@ else: # Python2
 
 
 class linuxmousekeybinds():
-    def __init__(self, devnam=None, nice=0, delay=0.05, exact=False, verbose=True, debug=False):
-        self.nice      = nice  # Nice value (priority) of process doing the keystroke (xdotool).
-        self.delay     = delay # Time between key-down and key-up event. Increase if binding only sometimes work.
+    def __init__(self, devnams=None, nice=0, delay=0.05, exact=False, verbose=True, debug=False):
+        self.devnams   = devnams  # Name of the device (Or list of alias names)
+        self.nice      = nice     # Nice value (priority) of process doing the keystroke (xdotool).
+        self.delay     = delay    # Time between key-down and key-up event. Increase if binding only sometimes work.
         self.verbose   = verbose  # Print info about whats going on?
-        self.exact     = exact  # Bind only if window title exactly matches the application name?
-        self.debug     = debug  # Print debug info
+        self.exact     = exact    # Bind only if window title exactly matches the application name?
+        self.debug     = debug    # Print debug info
         #--
-        self.actdevnam = devnam  # Name of the active device (managed internally).
-        self.running   = False  # Is the daemon running? (managed internally).
-        self.do_stop   = True  # Shall the daemon stop running? (managed internally).
-        self.bindbypid = False  # False: Do not check for PID, just windowname (managed internally).
-        #--
-        self.devs = {}  # database of all available devices
-        self.cfgs = {}  # database of configs
-        self.btns = {}  # database buttonname-to-evcode (for the active device)
-        #--
-        if self.actdevnam != None:
-            self._get_available_devs()  # create database of all available devices
-            self.select_dev(self.actdevnam)
+        self.devnam    = None   # Name of the active device
+        self.dev       = None   # Active device
+        self.running   = False  # Is the daemon running?
+        self.do_stop   = False  # Shall the daemon stop running?
+        self.bindbypid = False  # False: Do not check for PID, just windowname
+        self.dct_abk   = {}     # database mapping appname + btnname to keyname
+        self.dct_aek   = {}     # database mapping appname + evcode  to keyname
         #--
         signal.signal(signal.SIGINT, self.stop)
+
 
     def __del__(self):
         self.stop()
 
-    def _get_available_devs(self):
-        self.devs = {}  # database of all available devices
+
+    def bind_key_to_button(self, appnam, btnnam, keynam):
+        if keynam is None:
+            return
+        if type(appnam) == int:
+            appnam = str(appnam)
+            self.bindbypid = True
+        #--
+        if not appnam in self.dct_abk:
+            self.dct_abk[appnam] = {}
+        self.dct_abk[appnam][btnnam] = keynam
+
+
+    def _get_available_devs(self): # get dict with all available devices
+        devs = {}
         for devpth in natsort.natsorted(evdev.list_devices()):
             dev  = evdev.InputDevice(devpth)
             name = dev.name
             ind  = 1
-            while name in self.devs:
+            while name in devs:
                 ind += 1
                 name = "{} #{}".format(dev.name, ind)
-            self.devs[name] = dev
-        return self.devs
+            devs[name] = dev
+        return devs
+
 
     def _read_capabilities(self):
-        if self.actdevnam is None:
-            return
-        dev = self.devs[self.actdevnam]
+        dev = self.dev
         capdict = dev.capabilities(verbose=True)
         caplist = [c for l in capdict.values() for c in l]
-        self.btns = {}
+        btns = {}
         for cap in caplist:
             names, code = cap
             if type(names) != list:
@@ -74,59 +83,41 @@ class linuxmousekeybinds():
             for name in names:
                 name = name.upper()
                 if name.startswith("BTN_"):
-                    self.btns[name] = int(code)
+                    btns[name] = int(code)
                 if name.startswith("REL_"):
-                    self.btns[name + "+"] = +int(code)
-                    self.btns[name + "-"] = -int(code)
-
-    def _connect_dev(self, devnam=None):  # (re-)connect to first device of given devices
-        self.actdevnam = devnam or self.actdevnam
-        self._get_available_devs()
-        if self.actdevnam in self.devs:
-            self._read_capabilities()
-            return True
-        return False
-
-    def select_dev(self, devnam):
-        if not self._connect_dev(devnam) and self.verbose:
-            print("ERROR: Invalid device name \"{}\". Must be one of: {}".format(devnam, self.devs.keys()))
-
-    def bind_key_to_button(self, appnam, btnnam, keynam, devnam=None):
-        if devnam == None:
-            devnam = self.actdevnam
-        if devnam is None:
-            return
-        if keynam is None:
-            return
-        if type(appnam) == int:
-            appnam = str(appnam)
-            self.bindbypid = True
-        evcode = self.btns.get(btnnam, None)
-        if evcode == None:
-            if self.verbose:
-                print("ERROR: Invalid button name \"{}\". Must be one of: {}".format(btnnam, self.btns.keys()))
-            return
+                    btns[name + "+"] = +int(code)
+                    btns[name + "-"] = -int(code)
         #--
-        if not devnam in self.cfgs:
-            self.cfgs[devnam] = {}
-        if not appnam in self.cfgs[devnam]:
-            self.cfgs[devnam][appnam] = {}
-        if not evcode in self.cfgs[devnam][appnam]:
-            self.cfgs[devnam][appnam][evcode] = {}
-        #--
-        self.cfgs[devnam][appnam][evcode] = keynam
+        self.dct_aek = {}
+        for appnam in self.dct_abk:
+            if not appnam in self.dct_aek:
+                self.dct_aek[appnam] = {}
+            for btnnam in self.dct_abk[appnam]:
+                if btnnam in btns:
+                    evcode = btns[btnnam]
+                    self.dct_aek[appnam][evcode] = self.dct_abk[appnam][btnnam]
+        if self.debug:
+            print(self.dct_aek)
 
-    def _get_keynam(self, appnam, evcode, devnam=None):
-        if devnam == None:
-            devnam = self.actdevnam
-        if devnam is None:
-            return
+
+    def _connect_dev(self, devnam):
+        devs = self._get_available_devs()
+        if not devnam in devs:
+            return False
+        self.dev    = devs[devnam]
+        self.devnam = devnam
+        self._read_capabilities()
+        return True
+
+
+    def _get_keynam(self, appnam, evcode):
         if type(appnam) == int:
             appnam = str(appnam)
         for _appnam in [appnam, None]: # None = default binding settings
-            keynam = self.cfgs.get(devnam, {}).get(_appnam, {}).get(evcode, None)
+            keynam = self.dct_aek.get(_appnam, {}).get(evcode, None)
             if keynam is not None:
                 return keynam
+
 
     def _do_key(self, winind, keynam, down=True, up=True):
         cmd = "nice -n {} xdotool {} --window {} {}".format(self.nice, "{}", winind, keynam)
@@ -136,6 +127,7 @@ class linuxmousekeybinds():
             time.sleep(self.delay)
         if up:
             subprocess.Popen(cmd.format("keyup"), stdout=subprocess.PIPE, shell=True)
+
 
     def _do_macro(self, winind, macro):
         for command in macro:
@@ -152,43 +144,41 @@ class linuxmousekeybinds():
                 keynam = keynam.strip("-+")
                 self._do_key(winind, keynam, down, up)
 
-    def _set_callback_focus_on_off(self, appnam, cbfunc, typ, devnam=None):
-        if devnam == None:
-            devnam = self.actdevnam
-        if devnam is None:
-            return
-        if not devnam in self.cfgs:
-            self.cfgs[devnam] = {}
-        if not appnam in self.cfgs[devnam]:
-            self.cfgs[devnam][appnam] = {}
-        self.cfgs[devnam][appnam][typ] = cbfunc
 
-    def set_callback_focus_on(self, appnam, cbfunc, devnam=None):
-        self._set_callback_focus_on_off(appnam, cbfunc, "callback_focus_on", devnam)
+    def _set_callback_focus_on_off(self, appnam, cbfunc, typ):
+        if not appnam in self.dct_aek:
+            self.dct_aek[appnam] = {}
+        self.dct_aek[appnam][typ] = cbfunc
 
-    def set_callback_focus_off(self, appnam, cbfunc, devnam=None):
-        self._set_callback_focus_on_off(appnam, cbfunc, "callback_focus_off", devnam)
 
-    def _do_callback_focus_on_off(self, appnam, typ, devnam=None):
-        if devnam == None:
-            devnam = self.actdevnam
-        if devnam is None:
-            return
-        cbfunc = self.cfgs.get(devnam, {}).get(appnam, {}).get(typ, None)
+    def set_callback_focus_on(self, appnam, cbfunc):
+        self._set_callback_focus_on_off(appnam, cbfunc, "callback_focus_on")
+
+
+    def set_callback_focus_off(self, appnam, cbfunc):
+        self._set_callback_focus_on_off(appnam, cbfunc, "callback_focus_off")
+
+
+    def _do_callback_focus_on_off(self, appnam, typ):
+        cbfunc = self.dct_aek.get(appnam, {}).get(typ, None)
         if cbfunc != None:
             cbfunc()
 
-    def _do_callback_focus_on(self, appnam, devnam=None):
-        self._do_callback_focus_on_off(appnam, "callback_focus_on", devnam=None)
 
-    def _do_callback_focus_off(self, appnam, devnam=None):
-        self._do_callback_focus_on_off(appnam, "callback_focus_off", devnam=None)
+    def _do_callback_focus_on(self, appnam):
+        self._do_callback_focus_on_off(appnam, "callback_focus_on")
+
+
+    def _do_callback_focus_off(self, appnam):
+        self._do_callback_focus_on_off(appnam, "callback_focus_off")
+
 
     def _to_int(self, string):
         try:
             return int(string)
         except:
             return None
+
 
     def _get_active_window_index(self):
         h = subprocess.Popen("xdotool getactivewindow", stdout=subprocess.PIPE, shell=True)
@@ -197,6 +187,7 @@ class linuxmousekeybinds():
         winind = self._to_int(winind)
         #--
         return winind
+
 
     def _get_application_name_and_pid(self, winind):
         h = subprocess.Popen("xdotool getwindowpid {}".format(winind), stdout=subprocess.PIPE, shell=True)
@@ -209,23 +200,23 @@ class linuxmousekeybinds():
         appnam = h.stdout.read().decode('utf-8').strip()
         appnam = appnam.encode('ascii', 'ignore').decode('utf-8')
         if not self.exact:
-            done = (appnam in self.cfgs.get(self.actdevnam, {}))
+            done = (appnam in self.dct_aek)
             if not done:
                 h = subprocess.Popen("readlink -f /proc/{}/exe".format(apppid), stdout=subprocess.PIPE, shell=True)
                 h.wait()
                 apppth = h.stdout.read().decode('utf-8').strip()
                 apppth = apppth.encode('ascii', 'ignore').decode('utf-8')
-                if apppth in self.cfgs.get(self.actdevnam, {}):
+                if apppth in self.dct_aek:
                     appnam = apppth
                     done   = True
             if not done:
-                for cfg_appnam in self.cfgs.get(self.actdevnam, {}):
+                for cfg_appnam in self.dct_aek:
                     if appnam.startswith(cfg_appnam):
                         appnam = cfg_appnam
                         done   = True
                         break
             if not done:
-                for cfg_appnam in self.cfgs.get(self.actdevnam, {}):
+                for cfg_appnam in self.dct_aek:
                     if appnam.lower() in cfg_appnam.lower() or cfg_appnam.lower() in appnam.lower():
                         appnam = cfg_appnam
                         done   = True
@@ -233,35 +224,43 @@ class linuxmousekeybinds():
         #--
         return (appnam, apppid)
 
-    def run(self, in_new_thread=True):
-        if self.actdevnam is None:
-            return
+
+    def run(self, in_new_thread=False):
         if in_new_thread:
             thread.start_new_thread(self._run, ())
-            while not self.running:
-                time.sleep(.1)
         else:
             self._run()
 
-    def _run(self):
+
+    def _run(self, in_new_thread=True):
+        is_reconnect = False
         if self.verbose:
             print("Linux Mouse Keybinds started!")
-        if self.debug:
-            print("DEBUG: Devices: {}".format(list(self.devs.keys())))
-            print("DEBUG: Buttons: {}".format(list(self.btns.keys())))
-        #--
+        while self.do_stop == False:
+            for devnam in self.devnams:
+                if self._connect_dev(devnam):
+                    if is_reconnect:
+                        if self.verbose: # device got (temporarily) unconnected
+                            print("Active device got reconnected!")
+                    else:
+                        is_reconnect = True
+                    self.__run()
+            if self.do_stop == False:
+                time.sleep(1) # retry reconnecting in 1 sec
+        if self.verbose:
+            print("Linux Mouse Keybinds stopped!")
+
+
+    def __run(self):
         EV_KEY = evdev.ecodes.EV_KEY
         EV_REL = evdev.ecodes.EV_REL
-        dev = self.devs[self.actdevnam]
         winind_last = None
         appnam_last = None
-        self.do_stop = False
         self.running = True
         try:
             while self.do_stop == False:
-              try:
-                r, w, x = select.select([dev], [], [])
-                for event in dev.read():
+                r, w, x = select.select([self.dev], [], [])
+                for event in self.dev.read():
                     evtype = event.type
                     evcode = event.code
                     evvalu = event.value
@@ -298,27 +297,16 @@ class linuxmousekeybinds():
                         elif type(keynam) == str:
                             self._do_key(winind, keynam, down, up)
 
-              except OSError as exc:
-                if exc.strerror == "No such device": # device got (temporarily) unconnected
-                    if self.verbose:
-                        print("Active device got unconnected! Waiting for reconnect...")
-                    while self.do_stop == False: # wait for reconnect
-                        time.sleep(3)
-                        if self._connect_dev():
-                            if self.verbose:
-                                print("Active device got reconnected.")
-                            dev = self.devs[self.actdevnam]
-                            break
-                else:
-                    raise
-
+        except OSError as exc:
+            if self.verbose and exc.strerror == "No such device": # device got (temporarily) unconnected
+                print("Active device got disconnected! Waiting for reconnect...")
         finally:
             self.running = False
-        if self.verbose:
-            print("Linux Mouse Keybinds stopped!")
+
 
     def stop(self, signum=None, sigframe=None):
         self.do_stop = True
+
 
     def is_running(self):
         return self.running == True
