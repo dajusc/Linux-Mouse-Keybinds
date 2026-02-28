@@ -82,15 +82,20 @@ class linuxmousekeybinds():
         btns = {}
         for cap in caplist:
             names, code = cap
-            if type(names) != list:
+            if type(names) == str:
                 names = [names]
+            if type(names) != list:
+                continue
             for name in names:
                 name = name.upper()
+                if name == "?":
+                    name = f"BTN_{code}"
                 if name.startswith("BTN_"):
                     btns[name] = int(code)
                 if name.startswith("REL_"):
                     btns[name + "+"] = +int(code)
                     btns[name + "-"] = -int(code)
+        self.dct_btns = btns
         #--
         self.dct_aek = {}
         for appnam in self.dct_abk:
