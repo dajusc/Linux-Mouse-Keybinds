@@ -14,12 +14,13 @@ import natsort
 import time
 import signal
 import random
+from pprint import pprint
 
 if (sys.version_info > (3, 0)): # Python3
-     import _thread
-     thread = _thread
+    import _thread
+    thread = _thread
 else: # Python2
-     import thread
+    import thread
 
 
 class linuxmousekeybinds():
@@ -99,8 +100,6 @@ class linuxmousekeybinds():
                 if btnnam in btns:
                     evcode = btns[btnnam]
                     self.dct_aek[appnam][evcode] = self.dct_abk[appnam][btnnam]
-        if self.debug:
-            print(self.dct_aek)
 
 
     def _connect_dev(self, devnam):
@@ -110,6 +109,14 @@ class linuxmousekeybinds():
         self.dev    = devs[devnam]
         self.devnam = devnam
         self._read_capabilities()
+        if self.debug:
+            print(f'DEBUG: Available devices:')
+            pprint(devs)
+            print(f'DEBUG: Connected to device "{devnam}"')
+            print("DEBUG: Buttons available:")
+            pprint(self.dct_btns)
+            print("DEBUG: Application configuration:")
+            pprint(self.dct_aek)
         return True
 
 
@@ -269,6 +276,8 @@ class linuxmousekeybinds():
                     evvalu = event.value
 
                     if (evtype not in [EV_KEY, EV_REL]) or (evtype == EV_REL and evcode in [0, 1]):
+                        # if self.debug:
+                        #     print("DEBUG: evtype:{}, evcode:{}, evvalu:{}".format(evtype, evcode, evvalu))
                         continue
                     if (evtype == EV_REL):
                         evcode *= evvalu
@@ -302,7 +311,7 @@ class linuxmousekeybinds():
 
         except OSError as exc:
             if self.verbose and exc.strerror == "No such device": # device got (temporarily) unconnected
-                print("Active device got disconnected! Waiting for reconnect...")
+                print(f'Active device "{self.devnam}" got disconnected! Waiting for reconnect...')
         finally:
             self.running = False
 
