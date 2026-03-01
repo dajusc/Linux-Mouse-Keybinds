@@ -24,12 +24,13 @@ else: # Python2
 
 
 class linuxmousekeybinds():
-    def __init__(self, devnams=None, nice=0, delay=0.05, exact=False, verbose=True, debug=False):
+    def __init__(self, devnams=None, nice=0, delay=0.05, exact=False, keytowin=False, verbose=True, debug=False):
         self.devnams   = devnams  # Name of the device (Or list of alias names)
         self.nice      = nice     # Nice value (priority) of process doing the keystroke (xdotool).
         self.delay     = delay    # Time between key-down and key-up event. Increase if binding only sometimes work.
         self.verbose   = verbose  # Print info about whats going on?
         self.exact     = exact    # Bind only if window title exactly matches the application name?
+        self.keytowin  = keytowin # Send keystrokes directly to active window id?
         self.debug     = debug    # Print debug info
         #--
         self.devnam    = None   # Name of the active device
@@ -148,7 +149,10 @@ class linuxmousekeybinds():
 
 
     def _do_key(self, winind, keynam, down=True, up=True):
-        cmd = "nice -n {} xdotool {} --window {} {}".format(self.nice, "{}", winind, keynam)
+        if self.keytowin:
+            cmd = "nice -n {} xdotool {} --window {} {}".format(self.nice, "{}", winind, keynam)
+        else:
+            cmd = "nice -n {} xdotool {}             {}".format(self.nice, "{}",         keynam)
         if down:
             subprocess.Popen(cmd.format("keydown"), stdout=subprocess.PIPE, shell=True)
         if down and up:
