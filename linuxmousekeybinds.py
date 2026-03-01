@@ -6,6 +6,7 @@
 # If you get an "permission denied" error on start, check which group the devices
 # in /dev/input/ belong to (usually "input") and add your user to this group
 
+import os
 import sys
 import subprocess
 import evdev
