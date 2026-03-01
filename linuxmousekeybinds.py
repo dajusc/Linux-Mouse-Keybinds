@@ -248,25 +248,21 @@ class linuxmousekeybinds():
 
 
     def _run(self, in_new_thread=True):
-        is_reconnect = False
         if self.verbose:
             print("Linux Mouse Keybinds started!")
         while self.do_stop == False:
             for devnam in self.devnams:
                 if self._connect_dev(devnam):
-                    if is_reconnect:
-                        if self.verbose: # device got (temporarily) unconnected
-                            print("Active device got reconnected!")
-                    else:
-                        is_reconnect = True
-                    self.__run()
+                    if self.verbose:
+                        print(f'Connected to device "{self.devnam}"!')
+                    self._run2()
             if self.do_stop == False:
                 time.sleep(1) # retry reconnecting in 1 sec
         if self.verbose:
             print("Linux Mouse Keybinds stopped!")
 
 
-    def __run(self):
+    def _run2(self):
         EV_KEY = evdev.ecodes.EV_KEY
         EV_REL = evdev.ecodes.EV_REL
         winind_last = None
