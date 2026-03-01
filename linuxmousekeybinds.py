@@ -40,14 +40,27 @@ class linuxmousekeybinds():
         self.dct_abk   = {}     # database mapping appname + btnname to keyname
         self.dct_aek   = {}     # database mapping appname + evcode  to keyname
         #--
-        signal.signal(signal.SIGINT, self.stop)
-        #--
         if type(self.devnams) not in (list, set, tuple):
             self.devnams = (self.devnams,)
+        #--
+        if not self._user_has_evdev_access():
+            raise Exception("No access to evdev! This problem may be resolved by a) configuring a corresponding udev rule or b) by adding your user to the 'input' group, then reboot.")
+        #--
+        signal.signal(signal.SIGINT, self.stop)
 
 
     def __del__(self):
         self.stop()
+
+
+    def _user_has_evdev_access(self):
+        ev0_pth = "/dev/input/event0"
+        if not os.path.exists(ev0_pth):
+            return None
+        if os.access(ev0_pth, os.R_OK + os.W_OK):
+            return True
+        else:
+            return False
 
 
     def bind_key_to_button(self, appnam, btnnam, keynam):
