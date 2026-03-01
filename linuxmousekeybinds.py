@@ -239,12 +239,16 @@ class linuxmousekeybinds():
                     done   = True
             if not done:
                 for cfg_appnam in self.dct_aek:
+                    if cfg_appnam is None:
+                        continue
                     if appnam.startswith(cfg_appnam):
                         appnam = cfg_appnam
                         done   = True
                         break
             if not done:
                 for cfg_appnam in self.dct_aek:
+                    if cfg_appnam is None:
+                        continue
                     if appnam.lower() in cfg_appnam.lower() or cfg_appnam.lower() in appnam.lower():
                         appnam = cfg_appnam
                         done   = True
